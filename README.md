@@ -53,6 +53,7 @@ Si el repositorio ya existe localmente, solo configura el remote y ejecuta el pu
 
 ## Próximos pasos recomendados
 
+- Reemplazar `public/vortech-logo-text.svg` por el PNG/SVG oficial cuando esté disponible en alta resolución.
 - Reemplazar placeholders de contacto por datos reales.
 - Conectar el formulario a una API route con Resend, EmailJS u otro proveedor.
 - Añadir analítica, eventos de conversión y seguimiento de CTA.
