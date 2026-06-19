@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/site-config";
 
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://integra-controls.vercel.app"),
+  metadataBase: new URL("https://vortech.mx"),
   title: {
     default: `${siteConfig.companyName} | Automatización, control y tratamiento de agua`,
     template: `%s | ${siteConfig.shortName}`,

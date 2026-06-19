@@ -1,9 +1,9 @@
 export const siteConfig = {
-  companyName: "INTEGRA Controls & Water Systems",
-  shortName: "INTEGRA",
-  email: "contacto@integracontrols.example",
-  phone: "+1 (000) 000-0000",
-  location: "Operación regional · Placeholder",
+  companyName: "VORTECH",
+  shortName: "VORTECH",
+  email: "ventas@vortech.mx",
+  phone: "+52 6861455822",
+  location: "Baja California, Mexico",
   navItems: [
     { label: "Arquitectura", href: "#arquitectura" },
     { label: "Servicios", href: "#servicios" },
