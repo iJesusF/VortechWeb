@@ -1,58 +1,65 @@
-import { Activity, ArrowRight, Building2, CheckCircle2, CircuitBoard, Cloud, Droplets, Gauge, ShieldCheck } from "lucide-react";
+import { Activity, ArrowRight, Building2, CheckCircle2, CircuitBoard, Cloud, Droplets, Gauge, Layers3, Network, ShieldCheck } from "lucide-react";
 import { Header } from "@/components/header";
 import { Reveal } from "@/components/motion";
 import { TechnicalVisual } from "@/components/technical-visual";
 import { siteConfig } from "@/lib/site-config";
 
 const metrics = [
-  { title: "Automatización integral", icon: CircuitBoard },
-  { title: "Monitoreo en tiempo real", icon: Activity },
-  { title: "Integración PLC + Cloud", icon: Cloud },
-  { title: "Soluciones llave en mano", icon: ShieldCheck },
+  { title: "Campo + PLC + nube", text: "Una sola arquitectura desde sensores y tableros hasta dashboards ejecutivos.", icon: Network },
+  { title: "Control confiable", text: "Secuencias, alarmas, interlocks y datos listos para operar con evidencia.", icon: Activity },
+  { title: "Agua y utilities", text: "RO, UF, MF, EDI, PTAR, energía, aire, vapor y consumos críticos medidos.", icon: Gauge },
+  { title: "Llave en mano", text: "Ingeniería, fabricación, instalación, arranque y soporte en un mismo equipo.", icon: ShieldCheck },
 ];
 
 const services = [
   {
     title: "Automatización de edificios",
-    text: "Control HVAC, iluminación, sensores, monitoreo energético, integración BMS y optimización operativa.",
+    text: "Control HVAC, iluminación, sensores, monitoreo energético, integración BMS y optimización operativa para inmuebles modernos.",
     icon: Building2,
   },
   {
-    title: "Programación PLC y fabricación de equipos integrales",
-    text: "Desarrollo de lógica de control, tableros, integración HMI/SCADA, pruebas y puesta en marcha.",
+    title: "PLC, tableros, HMI y SCADA",
+    text: "Programación de lógica de control, fabricación de tableros, pantallas, supervisión, pruebas FAT/SAT y puesta en marcha.",
     icon: CircuitBoard,
   },
   {
     title: "Tratamiento de agua",
-    text: "Sistemas de ósmosis inversa, ultrafiltración, microfiltración, EDI, PTAR y soluciones para agua de proceso.",
+    text: "Sistemas de ósmosis inversa, ultrafiltración, microfiltración, EDI, PTAR y agua de proceso integrados al control operativo.",
     icon: Droplets,
   },
   {
     title: "Medición de utilities y nube",
-    text: "Medición de agua, energía, aire comprimido, vapor u otros servicios críticos con publicación de datos en dashboards cloud.",
-    icon: Gauge,
+    text: "Medición de agua, energía, aire comprimido, vapor u otros servicios críticos con datos históricos y dashboards cloud.",
+    icon: Cloud,
   },
 ];
 
 const problems = [
-  "Falta de visibilidad operativa",
-  "Consumo elevado de energía o utilities",
-  "Procesos manuales o poco confiables",
-  "Equipos sin integración",
-  "Datos aislados",
-  "Fallas difíciles de diagnosticar",
+  "No sabes qué está pasando en campo hasta que hay una falla",
+  "Los equipos trabajan aislados y nadie ve el sistema completo",
+  "Hay consumos altos sin medición confiable por área o proceso",
+  "Los operadores dependen de rutinas manuales y bitácoras incompletas",
+  "La información está en PLC, hojas de cálculo o pantallas separadas",
+  "Diagnosticar una falla toma demasiado tiempo y detiene la operación",
+];
+
+const architecture = [
+  { title: "1. Capturamos", text: "Sensores, medidores, actuadores, válvulas, bombas, variadores y analizadores." },
+  { title: "2. Controlamos", text: "PLC, BMS, lógica de proceso, alarmas, protecciones, HMI y SCADA." },
+  { title: "3. Conectamos", text: "Protocolos industriales, gateways, historian local, dashboards y nube segura." },
+  { title: "4. Optimizamos", text: "KPIs, tendencias, mantenimiento, eficiencia energética y mejora continua." },
 ];
 
 const timeline = [
-  "Diagnóstico técnico",
-  "Ingeniería y selección de tecnología",
-  "Programación / fabricación",
-  "Instalación e integración",
-  "Puesta en marcha",
-  "Soporte y optimización",
+  "Diagnóstico técnico y alcance",
+  "Arquitectura de control y selección de tecnología",
+  "Ingeniería, programación y fabricación",
+  "Instalación, integración y pruebas",
+  "Puesta en marcha con capacitación",
+  "Soporte, monitoreo y optimización",
 ];
 
-const techTags = ["PLC", "HMI", "SCADA", "BMS", "IoT Industrial", "Cloud Dashboards", "Sensores", "Medidores", "RO", "UF", "MF", "EDI", "PTAR", "Data Logging", "Remote Monitoring"];
+const techTags = ["PLC", "HMI", "SCADA", "BMS", "IoT Industrial", "Modbus", "BACnet", "OPC UA", "MQTT", "Cloud Dashboards", "Sensores", "Medidores", "RO", "UF", "MF", "EDI", "PTAR", "Data Logging", "Remote Monitoring"];
 
 function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy?: string }) {
   return (
@@ -71,23 +78,28 @@ export default function Home() {
       <main id="inicio" className="overflow-hidden">
         <section className="relative pt-32 sm:pt-40 lg:pt-44">
           <div className="absolute inset-x-0 top-20 h-px bg-gradient-to-r from-transparent via-cyanx/60 to-transparent" />
-          <div className="container-shell grid items-center gap-12 pb-20 lg:grid-cols-[1.02fr_.98fr] lg:pb-28">
+          <div className="container-shell grid items-center gap-12 pb-16 lg:grid-cols-[1.02fr_.98fr] lg:pb-24">
             <Reveal>
               <div className="max-w-3xl">
-                <span className="section-eyebrow">Ingeniería · Control · Agua · Datos</span>
+                <span className="section-eyebrow">Integración mecánica · Automatización · Control</span>
                 <h1 className="text-4xl font-black leading-[1.02] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
-                  Automatización, control y tratamiento de agua para operaciones inteligentes
+                  Convertimos sistemas mecánicos en operaciones inteligentes, medibles y automatizadas
                 </h1>
                 <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300 sm:text-xl">
-                  Integramos sistemas de automatización, PLC, medición de utilities, tratamiento de agua y monitoreo en la nube para edificios, plantas e infraestructura crítica.
+                  Integramos HVAC, agua, utilities, tableros, PLC, HMI/SCADA y dashboards cloud para que tu planta o edificio opere con más control, menos incertidumbre y datos accionables.
                 </p>
                 <div className="mt-9 flex flex-col gap-4 sm:flex-row">
                   <a href="#contacto" className="cta-button bg-cyanx text-slate-950 shadow-glow hover:-translate-y-0.5 hover:bg-white">
-                    Solicitar cotización <ArrowRight className="ml-2 size-4" aria-hidden="true" />
+                    Solicitar diagnóstico <ArrowRight className="ml-2 size-4" aria-hidden="true" />
                   </a>
-                  <a href="#servicios" className="cta-button border border-white/15 bg-white/5 text-white hover:-translate-y-0.5 hover:border-cyanx/70 hover:text-cyanx">
-                    Ver servicios
+                  <a href="#arquitectura" className="cta-button border border-white/15 bg-white/5 text-white hover:-translate-y-0.5 hover:border-cyanx/70 hover:text-cyanx">
+                    Ver cómo integramos
                   </a>
+                </div>
+                <div className="mt-8 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
+                  <span className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">Diseño + fabricación</span>
+                  <span className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">Arranque en campo</span>
+                  <span className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">Datos para decidir</span>
                 </div>
               </div>
             </Reveal>
@@ -97,18 +109,16 @@ export default function Home() {
           </div>
         </section>
 
-        <section aria-label="Métricas de confianza" className="container-shell pb-20">
+        <section aria-label="Capacidades clave" className="container-shell pb-16">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {metrics.map((metric, index) => {
               const Icon = metric.icon;
               return (
                 <Reveal key={metric.title} delay={index * 0.06}>
-                  <div className="glass-panel group rounded-3xl p-6 transition hover:-translate-y-1 hover:border-cyanx/40">
+                  <div className="glass-panel group h-full rounded-3xl p-6 transition hover:-translate-y-1 hover:border-cyanx/40">
                     <Icon className="mb-5 size-7 text-cyanx" aria-hidden="true" />
                     <h3 className="text-lg font-bold text-white">{metric.title}</h3>
-                    <div className="mt-5 h-1 w-full overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full w-2/3 origin-left animate-pulseLine rounded-full bg-cyanx" />
-                    </div>
+                    <p className="mt-3 text-sm leading-6 text-slate-300">{metric.text}</p>
                   </div>
                 </Reveal>
               );
@@ -116,8 +126,25 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="arquitectura" className="container-shell scroll-mt-28 py-20">
+          <div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:items-center">
+            <SectionHeading eyebrow="Arquitectura integrada" title="De la sala de máquinas al dashboard: todo conectado con una lógica clara." copy="La propuesta moderna no es solo automatizar un equipo; es unir sistemas mecánicos, eléctricos y digitales para que el cliente vea estado, consumo, alarmas, tendencias y oportunidades de ahorro." />
+            <div className="grid gap-4 sm:grid-cols-2">
+              {architecture.map((item, index) => (
+                <Reveal key={item.title} delay={index * 0.06}>
+                  <article className="glass-panel h-full rounded-[1.5rem] p-6">
+                    <Layers3 className="mb-4 size-6 text-cyanx" aria-hidden="true" />
+                    <h3 className="font-bold text-white">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-slate-300">{item.text}</p>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="servicios" className="container-shell scroll-mt-28 py-20">
-          <SectionHeading eyebrow="Servicios" title="Especialistas en sistemas críticos que conectan campo, control y datos." copy="Diseñamos soluciones robustas para instalaciones que requieren precisión, continuidad operativa y trazabilidad técnica." />
+          <SectionHeading eyebrow="Servicios" title="Capacidad completa para sistemas mecánicos automatizados y controlados." copy="Presentamos la empresa como un integrador técnico: entiende el proceso, construye el control, conecta los datos y deja la operación lista para escalar." />
           <div className="mt-12 grid gap-5 lg:grid-cols-4">
             {services.map((service, index) => {
               const Icon = service.icon;
@@ -141,9 +168,9 @@ export default function Home() {
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {problems.map((problem, index) => (
               <Reveal key={problem} delay={index * 0.04}>
-                <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
-                  <CheckCircle2 className="size-5 shrink-0 text-cyanx" aria-hidden="true" />
-                  <span className="font-medium text-slate-100">{problem}</span>
+                <div className="flex h-full items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+                  <CheckCircle2 className="mt-1 size-5 shrink-0 text-cyanx" aria-hidden="true" />
+                  <span className="font-medium leading-7 text-slate-100">{problem}</span>
                 </div>
               </Reveal>
             ))}
@@ -152,7 +179,7 @@ export default function Home() {
 
         <section id="soluciones" className="container-shell scroll-mt-28 py-20">
           <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
-            <SectionHeading eyebrow="Soluciones integrales" title="Diseñamos, fabricamos, programamos, instalamos y ponemos en marcha." copy="Acompañamos el ciclo completo del proyecto: desde el diagnóstico técnico y la selección de tecnología, hasta la integración en campo y la optimización posterior." />
+            <SectionHeading eyebrow="Soluciones llave en mano" title="Diseñamos, fabricamos, programamos, instalamos y ponemos en marcha." copy="Una página más chingona debe dejar claro que el prospecto no compra piezas aisladas: compra una solución completa, documentada y lista para operar." />
             <div id="proceso" className="scroll-mt-28 space-y-4">
               {timeline.map((step, index) => (
                 <Reveal key={step} delay={index * 0.05}>
@@ -173,7 +200,7 @@ export default function Home() {
 
         <section id="tecnologia" className="container-shell scroll-mt-28 py-20">
           <div className="glass-panel overflow-hidden rounded-[2rem] p-8 sm:p-10">
-            <SectionHeading eyebrow="Tecnología" title="Arquitecturas abiertas para control, datos y continuidad operativa." copy="Integramos tecnologías industriales y de tratamiento de agua con dashboards, medición y monitoreo remoto." />
+            <SectionHeading eyebrow="Tecnología" title="Arquitecturas abiertas para control, datos y continuidad operativa." copy="La web comunica que podemos convivir con equipos existentes y crear una capa moderna de operación sin encerrar al cliente en una sola marca." />
             <div className="mt-10 flex flex-wrap gap-3">
               {techTags.map((tag) => (
                 <span key={tag} className="rounded-full border border-cyanx/20 bg-cyanx/10 px-4 py-2 text-sm font-semibold text-cyan-100">
@@ -190,7 +217,7 @@ export default function Home() {
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.24em] text-cyanx">Siguiente nivel operativo</p>
                 <h2 className="mt-4 max-w-3xl text-3xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-                  Convierte tus instalaciones en sistemas inteligentes, medibles y automatizados
+                  Hagamos que tus sistemas mecánicos se vean, se controlen y se optimicen como una operación de clase mundial
                 </h2>
               </div>
               <a href="#contacto" className="cta-button mt-8 bg-white text-slate-950 hover:-translate-y-0.5 hover:bg-cyanx lg:mt-0">
@@ -202,7 +229,7 @@ export default function Home() {
 
         <section id="contacto" className="container-shell scroll-mt-28 py-20">
           <div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr]">
-            <SectionHeading eyebrow="Contacto" title="Cuéntanos qué operación quieres automatizar, medir o mejorar." copy="El formulario queda listo para conectarse posteriormente con una API route, Resend, EmailJS o el servicio de email que prefieras." />
+            <SectionHeading eyebrow="Contacto" title="Cuéntanos qué sistema quieres automatizar, medir o mejorar." copy="Para capturar prospectos, conviene pedir pocos datos, orientar el tipo de proyecto y prometer un siguiente paso claro: revisión técnica inicial." />
             <Reveal>
               <form className="glass-panel grid gap-5 rounded-[2rem] p-6 sm:grid-cols-2 sm:p-8" aria-label="Formulario de contacto">
                 {[
@@ -220,7 +247,8 @@ export default function Home() {
                   Tipo de proyecto
                   <select name="projectType" className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyanx focus:ring-2 focus:ring-cyanx/20" defaultValue="">
                     <option value="" disabled>Selecciona una opción</option>
-                    <option>Automatización de edificios</option>
+                    <option>Sistema mecánico automatizado</option>
+                    <option>Automatización de edificios / BMS</option>
                     <option>PLC / tableros / SCADA</option>
                     <option>Tratamiento de agua</option>
                     <option>Medición de utilities y nube</option>
@@ -229,13 +257,13 @@ export default function Home() {
                 </label>
                 <label className="grid gap-2 text-sm font-medium text-slate-200 sm:col-span-2">
                   Mensaje
-                  <textarea name="message" rows={5} className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyanx focus:ring-2 focus:ring-cyanx/20" placeholder="Describe tu necesidad, alcance o reto operativo." />
+                  <textarea name="message" rows={5} className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyanx focus:ring-2 focus:ring-cyanx/20" placeholder="Describe tu sistema, problema operativo, equipos actuales o meta de automatización." />
                 </label>
                 <div className="sm:col-span-2">
                   <button type="button" className="cta-button w-full bg-cyanx text-slate-950 shadow-glow hover:bg-white sm:w-auto">
-                    Enviar solicitud
+                    Pedir revisión técnica
                   </button>
-                  <p className="mt-4 text-sm text-slate-400">Próximo paso técnico: conectar este formulario a <code className="text-cyanx">/api/contact</code> o a un proveedor de email transaccional.</p>
+                  <p className="mt-4 text-sm text-slate-400">Recomendación práctica: conectar este formulario a <code className="text-cyanx">/api/contact</code>, Resend o un CRM para responder prospectos en menos de 24 horas.</p>
                 </div>
               </form>
             </Reveal>
@@ -247,7 +275,7 @@ export default function Home() {
         <div className="container-shell grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
             <p className="text-lg font-black tracking-[0.22em] text-white">{siteConfig.shortName}</p>
-            <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">{siteConfig.companyName} — automatización, control industrial, tratamiento de agua y medición inteligente de utilities.</p>
+            <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">{siteConfig.companyName} — integración de sistemas mecánicos, automatización, control industrial, tratamiento de agua y medición inteligente de utilities.</p>
           </div>
           <div>
             <h3 className="font-bold text-white">Servicios</h3>

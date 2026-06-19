@@ -5,6 +5,7 @@ export const siteConfig = {
   phone: "+1 (000) 000-0000",
   location: "Operación regional · Placeholder",
   navItems: [
+    { label: "Arquitectura", href: "#arquitectura" },
     { label: "Servicios", href: "#servicios" },
     { label: "Soluciones", href: "#soluciones" },
     { label: "Proceso", href: "#proceso" },
