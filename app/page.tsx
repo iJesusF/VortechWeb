@@ -43,6 +43,15 @@ const problems = [
   "Diagnosticar una falla toma demasiado tiempo y detiene la operación",
 ];
 
+const recentProjects = [
+  "Integración de sistema HVAC para edificio corporativo.",
+  "Automatización de planta de tratamiento de agua.",
+  "Supervisión energética con dashboards cloud.",
+  "Sistema de extracción y seguridad para cocina industrial.",
+  "Migración PLC WECON → L5X.",
+  "Integración de alarmas contraincendio.",
+];
+
 const architecture = [
   { title: "1. Capturamos", text: "Sensores, medidores, actuadores, válvulas, bombas, variadores y analizadores." },
   { title: "2. Controlamos", text: "PLC, BMS, lógica de proceso, alarmas, protecciones, HMI y SCADA." },
@@ -89,7 +98,7 @@ export default function Home() {
                   Integramos HVAC, agua, utilities, tableros, PLC, HMI/SCADA y dashboards cloud para que tu planta o edificio opere con más control, menos incertidumbre y datos accionables.
                 </p>
                 <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-                  <a href="#contacto" className="cta-button bg-cyanx text-slate-950 shadow-glow hover:-translate-y-0.5 hover:bg-white">
+                  <a href={`mailto:${siteConfig.email}`} className="cta-button bg-cyanx text-slate-950 shadow-glow hover:-translate-y-0.5 hover:bg-white">
                     Solicitar diagnóstico <ArrowRight className="ml-2 size-4" aria-hidden="true" />
                   </a>
                   <a href="#arquitectura" className="cta-button border border-white/15 bg-white/5 text-white hover:-translate-y-0.5 hover:border-cyanx/70 hover:text-cyanx">
@@ -220,54 +229,40 @@ export default function Home() {
                   Hagamos que tus sistemas mecánicos se vean, se controlen y se optimicen como una operación de clase mundial
                 </h2>
               </div>
-              <a href="#contacto" className="cta-button mt-8 bg-white text-slate-950 hover:-translate-y-0.5 hover:bg-cyanx lg:mt-0">
+              <a href={`mailto:${siteConfig.email}`} className="cta-button mt-8 bg-white text-slate-950 hover:-translate-y-0.5 hover:bg-cyanx lg:mt-0">
                 Hablemos de tu proyecto
               </a>
             </div>
           </Reveal>
         </section>
 
-        <section id="contacto" className="container-shell scroll-mt-28 py-20">
-          <div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr]">
-            <SectionHeading eyebrow="Contacto" title="Cuéntanos qué sistema quieres automatizar, medir o mejorar." copy="Para capturar prospectos, conviene pedir pocos datos, orientar el tipo de proyecto y prometer un siguiente paso claro: revisión técnica inicial." />
-            <Reveal>
-              <form className="glass-panel grid gap-5 rounded-[2rem] p-6 sm:grid-cols-2 sm:p-8" aria-label="Formulario de contacto">
-                {[
-                  ["Nombre", "name", "text"],
-                  ["Empresa", "company", "text"],
-                  ["Email", "email", "email"],
-                  ["Teléfono", "phone", "tel"],
-                ].map(([label, name, type]) => (
-                  <label key={name} className="grid gap-2 text-sm font-medium text-slate-200">
-                    {label}
-                    <input className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyanx focus:ring-2 focus:ring-cyanx/20" name={name} type={type} placeholder={label} required={name === "name" || name === "email"} />
-                  </label>
-                ))}
-                <label className="grid gap-2 text-sm font-medium text-slate-200 sm:col-span-2">
-                  Tipo de proyecto
-                  <select name="projectType" className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyanx focus:ring-2 focus:ring-cyanx/20" defaultValue="">
-                    <option value="" disabled>Selecciona una opción</option>
-                    <option>Sistema mecánico automatizado</option>
-                    <option>Automatización de edificios / BMS</option>
-                    <option>PLC / tableros / SCADA</option>
-                    <option>Tratamiento de agua</option>
-                    <option>Medición de utilities y nube</option>
-                    <option>Proyecto integral</option>
-                  </select>
-                </label>
-                <label className="grid gap-2 text-sm font-medium text-slate-200 sm:col-span-2">
-                  Mensaje
-                  <textarea name="message" rows={5} className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyanx focus:ring-2 focus:ring-cyanx/20" placeholder="Describe tu sistema, problema operativo, equipos actuales o meta de automatización." />
-                </label>
-                <div className="sm:col-span-2">
-                  <button type="button" className="cta-button w-full bg-cyanx text-slate-950 shadow-glow hover:bg-white sm:w-auto">
-                    Pedir revisión técnica
-                  </button>
-                  <p className="mt-4 text-sm text-slate-400">Recomendación práctica: conectar este formulario a <code className="text-cyanx">/api/contact</code>, Resend o un CRM para responder prospectos en menos de 24 horas.</p>
-                </div>
-              </form>
-            </Reveal>
+        <section id="proyectos" className="container-shell scroll-mt-28 py-20">
+          <SectionHeading eyebrow="Proyectos recientes" title="Experiencia real integrando sistemas mecánicos, control y datos." copy="En lugar de un formulario tradicional, mostramos capacidades aplicadas para que el prospecto identifique rápido si VORTECH puede resolver un reto similar." />
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {recentProjects.map((project, index) => (
+              <Reveal key={project} delay={index * 0.05}>
+                <article className="glass-panel group flex h-full min-h-40 flex-col justify-between overflow-hidden rounded-[1.75rem] p-6 transition duration-300 hover:-translate-y-2 hover:border-cyanx/45 hover:shadow-glow">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-full border border-cyanx/30 bg-cyanx/10 font-mono text-sm font-bold text-cyanx">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="h-px flex-1 translate-y-5 bg-gradient-to-r from-cyanx/50 to-transparent" />
+                  </div>
+                  <h3 className="mt-8 text-xl font-bold leading-8 text-white">{project}</h3>
+                </article>
+              </Reveal>
+            ))}
           </div>
+          <Reveal>
+            <div className="mt-10 flex flex-col items-start justify-between gap-5 rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-6 sm:flex-row sm:items-center">
+              <p className="max-w-2xl text-sm leading-6 text-slate-300">
+                ¿Tienes un proyecto parecido? Escríbenos directo y revisamos alcance, equipos existentes y siguiente paso técnico.
+              </p>
+              <a href={`mailto:${siteConfig.email}`} className="cta-button bg-cyanx text-slate-950 shadow-glow hover:bg-white">
+                Contactar a VORTECH
+              </a>
+            </div>
+          </Reveal>
         </section>
       </main>
 

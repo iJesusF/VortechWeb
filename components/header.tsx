@@ -17,8 +17,8 @@ export function Header() {
             </a>
           ))}
         </div>
-        <a href="#contacto" className="cta-button bg-cyanx text-slate-950 shadow-glow hover:-translate-y-0.5 hover:bg-white">
-          Solicitar cotización
+        <a href={`mailto:${siteConfig.email}`} className="cta-button bg-cyanx text-slate-950 shadow-glow hover:-translate-y-0.5 hover:bg-white">
+          Contactar
         </a>
       </nav>
     </header>

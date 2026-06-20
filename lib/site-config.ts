@@ -10,6 +10,6 @@ export const siteConfig = {
     { label: "Soluciones", href: "#soluciones" },
     { label: "Proceso", href: "#proceso" },
     { label: "Tecnología", href: "#tecnologia" },
-    { label: "Contacto", href: "#contacto" },
+    { label: "Proyectos", href: "#proyectos" },
   ],
 };
