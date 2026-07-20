@@ -76,4 +76,21 @@ body::after {
   .cta-button {
     @apply inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition duration-300 focus:outline-none focus:ring-2 focus:ring-cyanx focus:ring-offset-2 focus:ring-offset-graphite;
   }
+
+  /* Admin UI */
+  .admin-input {
+    @apply w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition focus:border-cyanx/50 focus:ring-2 focus:ring-cyanx/20;
+  }
+
+  .admin-btn-primary {
+    @apply inline-flex items-center gap-2 rounded-xl bg-cyanx/20 px-4 py-2 text-sm font-semibold text-cyanx transition hover:bg-cyanx/30 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .admin-btn-ghost {
+    @apply inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10;
+  }
+
+  .icon-btn {
+    @apply inline-flex size-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30;
+  }
 }

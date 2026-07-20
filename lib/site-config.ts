@@ -11,5 +11,6 @@ export const siteConfig = {
     { label: "Proceso", href: "#proceso" },
     { label: "Tecnología", href: "#tecnologia" },
     { label: "Proyectos", href: "#proyectos" },
+    { label: "Catálogo", href: "/catalogo" },
   ],
 };
