@@ -7,7 +7,7 @@ export const siteConfig = {
   navItems: [
     { label: "Servicios", href: "#servicios" },
     { label: "Soluciones", href: "#soluciones" },
-    { label: "Proceso", href: "#proceso" },
+    { label: "Catálogo", href: "/catalogo" },
     { label: "Tecnología", href: "#tecnologia" },
     { label: "Contacto", href: "#contacto" },
   ],
