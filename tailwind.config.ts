@@ -11,7 +11,7 @@ const config: Config = {
         steel: "#9fb3c8",
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "Inter", "system-ui", "sans-serif"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
       },
       boxShadow: {
         glow: "0 0 45px rgba(19, 216, 255, 0.22)",

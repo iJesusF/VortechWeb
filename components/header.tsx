@@ -6,7 +6,7 @@ export function Header() {
       <nav className="container-shell flex h-20 items-center justify-between" aria-label="Navegación principal">
         <a href="#inicio" className="group flex items-center gap-3" aria-label="Ir al inicio">
           <span className="grid size-10 place-items-center rounded-xl border border-cyanx/30 bg-cyanx/10 text-sm font-black text-cyanx shadow-glow">
-            IC
+            VT
           </span>
           <span className="text-lg font-black tracking-[0.22em] text-white">{siteConfig.shortName}</span>
         </a>
@@ -17,8 +17,8 @@ export function Header() {
             </a>
           ))}
         </div>
-        <a href="#contacto" className="cta-button bg-cyanx text-slate-950 shadow-glow hover:-translate-y-0.5 hover:bg-white">
-          Solicitar cotización
+        <a href={`mailto:${siteConfig.email}`} className="cta-button bg-cyanx text-slate-950 shadow-glow hover:-translate-y-0.5 hover:bg-white">
+          Contactar
         </a>
       </nav>
     </header>
