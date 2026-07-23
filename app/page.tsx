@@ -3,6 +3,7 @@ import { Header } from "@/components/header";
 import { Reveal } from "@/components/motion";
 import { TechnicalVisual } from "@/components/technical-visual";
 import { siteConfig } from "@/lib/site-config";
+import { Footer } from "@/components/footer";
 
 const metrics = [
   { title: "Campo + PLC + nube", text: "Una sola arquitectura desde sensores y tableros hasta dashboards ejecutivos.", icon: Network },
@@ -220,7 +221,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container-shell py-16">
+        <section id="contacto" className="container-shell scroll-mt-28 py-16">
           <Reveal>
             <div className="relative overflow-hidden rounded-[2rem] border border-cyanx/25 bg-gradient-to-br from-cyanx/20 via-white/[0.06] to-blue-900/20 p-8 shadow-glow sm:p-12 lg:flex lg:items-center lg:justify-between">
               <div>
@@ -266,32 +267,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-white/10 py-10">
-        <div className="container-shell grid gap-8 md:grid-cols-4">
-          <div className="md:col-span-2">
-            <p className="text-lg font-black tracking-[0.22em] text-white">{siteConfig.shortName}</p>
-            <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">{siteConfig.companyName} — integración de sistemas mecánicos, automatización, control industrial, tratamiento de agua y medición inteligente de utilities.</p>
-          </div>
-          <div>
-            <h3 className="font-bold text-white">Servicios</h3>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
-              <li>Automatización BMS</li>
-              <li>PLC, HMI y SCADA</li>
-              <li>RO, UF, MF, EDI y PTAR</li>
-              <li>Dashboards cloud</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-bold text-white">Contacto</h3>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
-              <li>{siteConfig.email}</li>
-              <li>{siteConfig.phone}</li>
-              <li>{siteConfig.location}</li>
-            </ul>
-          </div>
-        </div>
-        <div className="container-shell mt-8 text-xs text-slate-500">© {new Date().getFullYear()} {siteConfig.companyName}. Todos los derechos reservados.</div>
-      </footer>
+      <Footer />
     </>
   );
 }
