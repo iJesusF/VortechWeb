@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Check, X, MessageCircle, Share2, AlertCircle } from "lucide-react";
+import { Download, Check, X, MessageCircle, Share2 } from "lucide-react";
 import { formatMXN } from "@/lib/quotations/calculations";
 import { siteConfig } from "@/lib/site-config";
 
@@ -37,7 +37,7 @@ const demoQuote = {
   terms: "50% anticipo, 50% contra entrega. Vigencia 15 días naturales.",
 };
 
-export function PublicQuoteView({ token }: Props) {
+export function PublicQuoteView({ token: _token }: Props) {
   const [accepted, setAccepted] = useState(false);
   const [rejected, setRejected] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);

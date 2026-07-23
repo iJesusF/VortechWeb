@@ -37,7 +37,7 @@ export class MockBillingProvider implements BillingProvider {
     return { valid: errors.length === 0, errors };
   }
 
-  async createInvoice(params: CreateInvoiceParams): Promise<InvoiceResult> {
+  async createInvoice(_params: CreateInvoiceParams): Promise<InvoiceResult> {
     const externalId = `MOCK-INV-${Date.now()}`;
     return {
       externalId,
@@ -48,7 +48,7 @@ export class MockBillingProvider implements BillingProvider {
     };
   }
 
-  async getInvoiceStatus(externalId: string): Promise<InvoiceStatus> {
+  async getInvoiceStatus(_externalId: string): Promise<InvoiceStatus> {
     return {
       status: "stamped",
       uuid: `MOCK-UUID-${externalId.substring(9)}`,
