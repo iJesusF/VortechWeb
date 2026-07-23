@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Search, GripVertical, Save, Eye, Send, Copy } from "lucide-react";
+import { Plus, Trash2, Search, GripVertical, Save, Eye } from "lucide-react";
 import { calculateQuoteTotals, formatMXN } from "@/lib/quotations/calculations";
 import type { LineItemInput } from "@/lib/quotations/calculations";
 import type { DiscountType } from "@/lib/types/database";
@@ -41,7 +41,7 @@ function createEmptyItem(): QuoteItemForm {
 
 export default function NuevaCotizacionPage() {
   const [items, setItems] = useState<QuoteItemForm[]>([createEmptyItem()]);
-  const [generalDiscount, setGeneralDiscount] = useState({ type: "none" as DiscountType, value: 0 });
+  const [generalDiscount, _setGeneralDiscount] = useState({ type: "none" as DiscountType, value: 0 });
   const [shipping, setShipping] = useState(0);
   const [notes, setNotes] = useState("");
   const [terms, setTerms] = useState("");
