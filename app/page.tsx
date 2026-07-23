@@ -220,7 +220,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container-shell py-16">
+        <section id="contacto" className="container-shell scroll-mt-28 py-16">
           <Reveal>
             <div className="relative overflow-hidden rounded-[2rem] border border-cyanx/25 bg-gradient-to-br from-cyanx/20 via-white/[0.06] to-blue-900/20 p-8 shadow-glow sm:p-12 lg:flex lg:items-center lg:justify-between">
               <div>

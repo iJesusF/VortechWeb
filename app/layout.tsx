@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { siteConfig } from "@/lib/site-config";
+import { QuotationCartProvider } from "@/components/quotation-cart";
 
 
 export const metadata: Metadata = {
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className="dark">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased"><QuotationCartProvider>{children}</QuotationCartProvider></body>
     </html>
   );
 }
