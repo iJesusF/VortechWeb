@@ -149,7 +149,7 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["quote_requests"]["Row"], "id" | "request_number" | "created_at" | "updated_at">;
+        Insert: Omit<Database["public"]["Tables"]["quote_requests"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["quote_requests"]["Insert"]>;
       };
       quotes: {

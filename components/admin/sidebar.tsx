@@ -8,7 +8,6 @@ import {
   FileText,
   Users,
   ClipboardList,
-  Settings,
   CreditCard,
   Receipt,
   Building2,

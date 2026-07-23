@@ -1,4 +1,4 @@
-import { FileText, ClipboardList, Users, CheckCircle2, Clock, AlertTriangle, DollarSign, TrendingUp } from "lucide-react";
+import { FileText, ClipboardList, CheckCircle2, Clock, AlertTriangle, DollarSign, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
 const stats = [
