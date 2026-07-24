@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+import type { Database } from "@/lib/database.types"
+
+type QuoteRequestInsert =
+  Database["public"]["Tables"]["quote_requests"]["Insert"]
+
 const cartItemSchema = z.object({
   product_id: z.string().optional(),
   name: z.string().min(1).max(200),
