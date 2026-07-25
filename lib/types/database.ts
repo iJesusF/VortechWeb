@@ -62,12 +62,12 @@ export interface Address {
 export interface CartSnapshotItem {
   product_id?: string;
   name: string;
-  sku?: string;
+  sku?: string | null;
   quantity: number;
-  url?: string;
-  observations?: string;
-  unit_price?: number;
-  image_url?: string;
+  url?: string | null;
+  observations?: string | null;
+  unit_price?: number | null;
+  image_url?: string | null;
 }
 
 export interface Database {
@@ -87,6 +87,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["categories"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["categories"]["Insert"]>;
+        Relationships: [];
       };
       products: {
         Row: {
@@ -110,6 +111,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["products"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["products"]["Insert"]>;
+        Relationships: [];
       };
       clients: {
         Row: {
@@ -132,6 +134,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["clients"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["clients"]["Insert"]>;
+        Relationships: [];
       };
       quote_requests: {
         Row: {
@@ -151,6 +154,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["quote_requests"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["quote_requests"]["Insert"]>;
+        Relationships: [];
       };
       quotes: {
         Row: {
@@ -183,6 +187,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["quotes"]["Row"], "id" | "quote_number" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["quotes"]["Insert"]>;
+        Relationships: [];
       };
       quote_items: {
         Row: {
@@ -208,6 +213,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["quote_items"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["quote_items"]["Insert"]>;
+        Relationships: [];
       };
       quote_events: {
         Row: {
@@ -219,6 +225,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["quote_events"]["Row"], "id" | "created_at">;
         Update: Partial<Database["public"]["Tables"]["quote_events"]["Insert"]>;
+        Relationships: [];
       };
       payment_methods: {
         Row: {
@@ -238,6 +245,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["payment_methods"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["payment_methods"]["Insert"]>;
+        Relationships: [];
       };
       payment_sessions: {
         Row: {
@@ -256,6 +264,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["payment_sessions"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["payment_sessions"]["Insert"]>;
+        Relationships: [];
       };
       billing_documents: {
         Row: {
@@ -273,6 +282,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["billing_documents"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["billing_documents"]["Insert"]>;
+        Relationships: [];
       };
       company_settings: {
         Row: {
@@ -301,6 +311,7 @@ export interface Database {
         };
         Insert: Omit<Database["public"]["Tables"]["company_settings"]["Row"], "id" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["company_settings"]["Insert"]>;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

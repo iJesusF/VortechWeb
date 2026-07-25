@@ -51,7 +51,7 @@ export class MockBillingProvider implements BillingProvider {
   async getInvoiceStatus(_externalId: string): Promise<InvoiceStatus> {
     return {
       status: "stamped",
-      uuid: `MOCK-UUID-${externalId.substring(9)}`,
+      uuid: `MOCK-UUID-${_externalId.substring(9)}`,
     };
   }
 

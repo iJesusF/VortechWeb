@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-import type { Database } from "@/lib/database.types"
+import type { Database } from "@/lib/types/database";
 
 type QuoteRequestInsert =
-  Database["public"]["Tables"]["quote_requests"]["Insert"]
+  Database["public"]["Tables"]["quote_requests"]["Insert"];
 
 const cartItemSchema = z.object({
   product_id: z.string().optional(),
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       const { createServiceRoleClient } = await import("@/lib/supabase/server");
       const supabase = createServiceRoleClient();
 
-      const { error: dbError } = await supabase.from("quote_requests").insert({
+      const quoteRequest: QuoteRequestInsert = {
         request_number: requestNumber,
         customer_name: data.customer_name,
         company: data.company || null,
@@ -88,7 +88,12 @@ export async function POST(request: NextRequest) {
         general_notes: data.general_notes || null,
         status: "new" as const,
         cart_snapshot: data.cart_snapshot,
-      });
+        converted_quote_id: null,
+      };
+
+      const { error: dbError } = await supabase
+        .from("quote_requests")
+        .insert(quoteRequest);
 
       if (dbError) {
         console.error("Failed to save quote request:", dbError.message);
