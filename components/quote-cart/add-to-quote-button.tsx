@@ -3,10 +3,18 @@
 import { useState } from "react";
 import { Plus, Check } from "lucide-react";
 import { useQuoteCart } from "./cart-provider";
-import type { DemoProduct } from "@/lib/data/catalog-demo";
+
+export interface QuoteCartProduct {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string | null;
+  unit_price: number | null;
+  image_url: string | null;
+}
 
 interface AddToQuoteButtonProps {
-  product: DemoProduct;
+  product: QuoteCartProduct;
   variant?: "small" | "large";
 }
 

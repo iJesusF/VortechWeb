@@ -21,6 +21,8 @@ export type QuoteItemType = "catalog" | "custom";
 
 export type DiscountType = "none" | "fixed" | "percentage";
 
+export type PriceMode = "request_quote" | "fixed" | "from" | "hidden";
+
 export type PaymentMethodType = "gateway" | "bank_transfer";
 
 export type FeeType = "none" | "fixed" | "percentage";
@@ -99,19 +101,57 @@ export interface Database {
           description: string | null;
           short_description: string | null;
           unit_price: number | null;
+          price: number | null;
+          price_mode: PriceMode;
           currency: string;
           unit: string;
           image_url: string | null;
           images: string[];
           specifications: Json | null;
+          discount_type: DiscountType;
+          discount_value: number;
+          tax_rate: number;
           is_active: boolean;
+          is_featured: boolean;
           sort_order: number;
+          whatsapp_message_override: string | null;
           created_at: string;
           updated_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["products"]["Row"], "id" | "created_at" | "updated_at">;
         Update: Partial<Database["public"]["Tables"]["products"]["Insert"]>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "categories";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      product_images: {
+        Row: {
+          id: string;
+          product_id: string;
+          storage_path: string;
+          public_url: string;
+          alt_text: string | null;
+          sort_order: number;
+          is_cover: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["product_images"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["product_images"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       clients: {
         Row: {
@@ -319,3 +359,10 @@ export interface Database {
     Enums: Record<string, never>;
   };
 }
+export type Category = Database["public"]["Tables"]["categories"]["Row"];
+export type Product = Database["public"]["Tables"]["products"]["Row"];
+export type ProductImage = Database["public"]["Tables"]["product_images"]["Row"];
+export type ProductWithRelations = Product & {
+  categories: Pick<Category, "id" | "name" | "slug"> | null;
+  product_images: ProductImage[];
+};

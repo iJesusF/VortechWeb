@@ -14,10 +14,14 @@ import {
   Menu,
   X,
   ExternalLink,
+  Package,
+  FolderTree,
 } from "lucide-react";
 
 const adminNav = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "Catálogo", href: "/admin/productos", icon: Package },
+  { label: "Categorías", href: "/admin/categorias", icon: FolderTree },
   { label: "Solicitudes", href: "/admin/solicitudes", icon: ClipboardList },
   { label: "Clientes", href: "/admin/clientes", icon: Users },
   { label: "Cotizaciones", href: "/admin/cotizaciones", icon: FileText },
