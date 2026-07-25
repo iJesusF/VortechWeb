@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,12 +18,21 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      // TODO: Implement with Supabase Auth
-      // const supabase = createClient();
-      // const { error } = await supabase.auth.signInWithPassword({ email, password });
-      // if (error) throw error;
-      // router.push("/admin");
-      setError("Autenticación requiere conexión con Supabase. Configura las variables de entorno.");
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        if (signInError.code === "invalid_credentials") {
+          throw new Error("Correo o contraseña incorrectos.");
+        }
+        throw signInError;
+      }
+
+      router.replace("/admin");
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error de autenticación");
     } finally {
@@ -54,6 +66,7 @@ export default function AdminLoginPage() {
               id="login-email"
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-cyanx/40 focus:outline-none"
@@ -67,6 +80,7 @@ export default function AdminLoginPage() {
               id="login-password"
               type="password"
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-cyanx/40 focus:outline-none"
