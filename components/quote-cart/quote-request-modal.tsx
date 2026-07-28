@@ -45,6 +45,10 @@ export function QuoteRequestModal({ onClose }: Props) {
     setSubmitting(true);
 
     try {
+      const notes = [generalNote.trim(), formData.comments.trim()]
+        .filter(Boolean)
+        .join("\n\n");
+
       const response = await fetch("/api/quote-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -54,15 +58,17 @@ export function QuoteRequestModal({ onClose }: Props) {
           email: formData.email.trim(),
           phone: formData.phone.trim(),
           rfc: formData.rfc.trim() || null,
-          general_notes: generalNote || formData.comments.trim() || null,
+          general_notes: notes || null,
           cart_snapshot: items.map((item) => ({
             product_id: item.productId,
             name: item.name,
             sku: item.sku || null,
             quantity: item.quantity,
-            url: item.url ? `https://vortech.mx${item.url}` : null,
+            url: item.url
+              ? new URL(item.url, window.location.origin).toString()
+              : null,
             observations: item.observations || null,
-            unit_price: item.unitPrice || null,
+            unit_price: item.unitPrice ?? null,
             image_url: item.imageUrl || null,
           })),
         }),

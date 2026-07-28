@@ -1,36 +1,18 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/types/database";
+import { quoteRequestSchema } from "@/lib/validations/quote-request";
 
 type QuoteRequestInsert =
   Database["public"]["Tables"]["quote_requests"]["Insert"];
 
-const cartItemSchema = z.object({
-  product_id: z.string().optional(),
-  name: z.string().min(1).max(200),
-  sku: z.string().max(50).nullable().optional(),
-  quantity: z.number().int().min(1).max(9999),
-  url: z.string().max(500).nullable().optional(),
-  observations: z.string().max(500).nullable().optional(),
-  unit_price: z.number().nullable().optional(),
-  image_url: z.string().max(500).nullable().optional(),
-});
-
-const quoteRequestSchema = z.object({
-  customer_name: z.string().min(1, "Nombre requerido").max(200),
-  company: z.string().max(200).nullable().optional(),
-  email: z.string().email("Correo inválido").max(200),
-  phone: z.string().min(7, "Teléfono inválido").max(20),
-  rfc: z.string().max(13).nullable().optional(),
-  general_notes: z.string().max(2000).nullable().optional(),
-  cart_snapshot: z.array(cartItemSchema).min(1, "Al menos un producto requerido").max(50),
-});
-
-// Simple rate limiting in memory (in production use Redis or similar)
 const requestCounts = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT = 5; // requests
-const RATE_WINDOW = 60 * 1000; // per minute
+const RATE_LIMIT = 5;
+const RATE_WINDOW = 60 * 1000;
+const MAX_BODY_BYTES = 100_000;
+const MAX_INSERT_ATTEMPTS = 3;
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -39,81 +21,188 @@ function isRateLimited(ip: string): boolean {
     requestCounts.set(ip, { count: 1, resetAt: now + RATE_WINDOW });
     return false;
   }
-  entry.count++;
+  entry.count += 1;
   return entry.count > RATE_LIMIT;
 }
 
 function generateRequestNumber(): string {
   const date = new Date();
-  const prefix = "SOL";
   const datePart = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `${prefix}-${datePart}-${random}`;
+  const randomPart = randomUUID().replaceAll("-", "").slice(0, 8).toUpperCase();
+  return `SOL-${datePart}-${randomPart}`;
 }
 
 export async function POST(request: NextRequest) {
+  const traceId = randomUUID();
+
   try {
-    // Rate limiting
-    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
+    console.info("[quote-request]", { traceId, event: "submission_started" });
+
+    const contentLength = Number(request.headers.get("content-length") ?? "0");
+    if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
+      return NextResponse.json(
+        { error: "La solicitud es demasiado grande.", trace_id: traceId },
+        { status: 413 }
+      );
+    }
+
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const ip =
+      forwardedFor?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
     if (isRateLimited(ip)) {
       return NextResponse.json(
-        { error: "Demasiadas solicitudes. Intenta en un minuto." },
+        {
+          error: "Demasiadas solicitudes. Intenta en un minuto.",
+          trace_id: traceId,
+        },
         { status: 429 }
       );
     }
 
-    const body = await request.json();
-    const validation = quoteRequestSchema.safeParse(body);
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          error: "El contenido de la solicitud no es válido.",
+          trace_id: traceId,
+        },
+        { status: 400 }
+      );
+    }
 
+    const validation = quoteRequestSchema.safeParse(body);
     if (!validation.success) {
-      const firstError = validation.error.errors[0]?.message || "Datos inválidos";
-      return NextResponse.json({ error: firstError }, { status: 400 });
+      const firstIssue = validation.error.issues[0];
+      console.warn("[quote-request]", {
+        traceId,
+        event: "validation_failed",
+        issue: firstIssue?.path.join("."),
+      });
+      return NextResponse.json(
+        {
+          error: firstIssue?.message ?? "Datos inválidos",
+          trace_id: traceId,
+        },
+        { status: 400 }
+      );
+    }
+
+    console.info("[quote-request]", {
+      traceId,
+      event: "validation_succeeded",
+      itemCount: validation.data.cart_snapshot.length,
+    });
+
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.SUPABASE_SERVICE_ROLE_KEY
+    ) {
+      console.error("[quote-request]", {
+        traceId,
+        event: "database_configuration_missing",
+      });
+      return NextResponse.json(
+        {
+          error:
+            "El servicio de solicitudes no está disponible temporalmente. Contáctanos por WhatsApp o intenta más tarde.",
+          trace_id: traceId,
+        },
+        { status: 503 }
+      );
     }
 
     const data = validation.data;
-    const requestNumber = generateRequestNumber();
+    const supabase = createServiceRoleClient();
 
-    // If Supabase is configured, save to database
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      const { createServiceRoleClient } = await import("@/lib/supabase/server");
-      const supabase = createServiceRoleClient();
-
+    for (let attempt = 1; attempt <= MAX_INSERT_ATTEMPTS; attempt += 1) {
+      const requestNumber = generateRequestNumber();
       const quoteRequest: QuoteRequestInsert = {
         request_number: requestNumber,
         customer_name: data.customer_name,
         company: data.company || null,
-        email: data.email,
+        email: data.email.toLowerCase(),
         phone: data.phone,
-        rfc: data.rfc || null,
+        rfc: data.rfc?.toUpperCase() || null,
         general_notes: data.general_notes || null,
-        status: "new" as const,
+        status: "new",
         cart_snapshot: data.cart_snapshot,
         converted_quote_id: null,
       };
 
-      const { error: dbError } = await supabase
-        .from("quote_requests")
-        .insert(quoteRequest);
+      console.info("[quote-request]", {
+        traceId,
+        event: "database_insert_started",
+        attempt,
+      });
 
-      if (dbError) {
-        console.error("Failed to save quote request:", dbError.message);
-        // Don't expose internal error details
+      const { data: savedRequest, error: databaseError } = await supabase
+        .from("quote_requests")
+        .insert(quoteRequest)
+        .select("id, request_number, created_at, status")
+        .single();
+
+      if (!databaseError && savedRequest) {
+        console.info("[quote-request]", {
+          traceId,
+          event: "database_insert_succeeded",
+          recordId: savedRequest.id,
+          itemCount: data.cart_snapshot.length,
+        });
         return NextResponse.json(
-          { error: "Error al guardar la solicitud. Intenta de nuevo." },
-          { status: 500 }
+          {
+            success: true,
+            request_number: savedRequest.request_number,
+            message: "Solicitud recibida correctamente",
+          },
+          { status: 201 }
         );
       }
+
+      if (databaseError?.code === "23505" && attempt < MAX_INSERT_ATTEMPTS) {
+        continue;
+      }
+
+      console.error("[quote-request]", {
+        traceId,
+        event: "database_insert_failed",
+        code: databaseError?.code,
+        message: databaseError?.message,
+      });
+      return NextResponse.json(
+        {
+          error:
+            "No pudimos guardar tu solicitud. No se registró ningún envío; intenta nuevamente.",
+          trace_id: traceId,
+        },
+        { status: 500 }
+      );
     }
 
-    // Return success even without DB (for development without Supabase)
-    return NextResponse.json({
-      success: true,
-      request_number: requestNumber,
-      message: "Solicitud recibida correctamente",
-    });
-  } catch {
     return NextResponse.json(
-      { error: "Error interno. Intenta de nuevo." },
+      {
+        error:
+          "No pudimos generar un folio único. No se registró ningún envío; intenta nuevamente.",
+        trace_id: traceId,
+      },
+      { status: 500 }
+    );
+  } catch (error) {
+    console.error("[quote-request]", {
+      traceId,
+      event: "unexpected_error",
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
+    return NextResponse.json(
+      {
+        error:
+          "Ocurrió un error interno. No se confirmó el envío; intenta nuevamente.",
+        trace_id: traceId,
+      },
       { status: 500 }
     );
   }
