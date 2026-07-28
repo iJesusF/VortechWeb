@@ -145,8 +145,8 @@ BEGIN
   WHERE id = settings_row.id;
 
   generated_public_token :=
-    REPLACE(uuid_generate_v4()::TEXT, '-', '')
-    || REPLACE(uuid_generate_v4()::TEXT, '-', '');
+    REPLACE(pg_catalog.gen_random_uuid()::TEXT, '-', '')
+    || REPLACE(pg_catalog.gen_random_uuid()::TEXT, '-', '');
 
   INSERT INTO public.quotes (
     quote_number,

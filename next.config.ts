@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: process.cwd(),
+  outputFileTracingIncludes: {
+    "/api/**": ["./node_modules/pdfkit/js/data/**/*"],
+  },
+  serverExternalPackages: ["pdfkit"],
   reactStrictMode: true,
   images: {
     remotePatterns: [
