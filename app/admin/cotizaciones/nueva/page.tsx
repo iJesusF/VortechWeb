@@ -22,7 +22,7 @@ export default async function NuevaCotizacionPage({ searchParams }: PageProps) {
         .order("business_name", { ascending: true }),
       supabase
         .from("products")
-        .select("id, name, sku, price, unit_price, unit, tax_rate, price_mode")
+        .select("id, name, description, sku, price, unit_price, unit, tax_rate, price_mode")
         .eq("is_active", true)
         .order("name", { ascending: true }),
       supabase

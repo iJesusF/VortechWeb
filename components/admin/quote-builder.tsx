@@ -16,10 +16,13 @@ import type {
 type Client = Database["public"]["Tables"]["clients"]["Row"];
 type CompanySettings = Database["public"]["Tables"]["company_settings"]["Row"];
 type QuoteRequest = Database["public"]["Tables"]["quote_requests"]["Row"];
+type Quote = Database["public"]["Tables"]["quotes"]["Row"];
+type QuoteItem = Database["public"]["Tables"]["quote_items"]["Row"];
 
 interface ProductOption {
   id: string;
   name: string;
+  description: string | null;
   sku: string | null;
   price: number | null;
   unit_price: number | null;
@@ -62,6 +65,10 @@ interface QuoteBuilderProps {
   products: ProductOption[];
   settings: CompanySettings | null;
   quoteRequest: QuoteRequest | null;
+  existingQuote?: {
+    quote: Quote;
+    items: QuoteItem[];
+  };
   initialError?: string;
 }
 
@@ -94,13 +101,29 @@ export function QuoteBuilder({
   products,
   settings,
   quoteRequest,
+  existingQuote,
   initialError = "",
 }: QuoteBuilderProps) {
   const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
   const defaultTaxRate = settings?.tax_enabled ? settings.default_tax_rate : 0;
-  const initialItems =
-    quoteRequest && quoteRequest.cart_snapshot.length > 0
+  const initialItems = existingQuote
+    ? existingQuote.items.map<QuoteItemForm>((item) => ({
+        id: item.id,
+        itemType: item.item_type,
+        productId: item.product_id,
+        sku: item.sku ?? "",
+        name: item.name,
+        description: item.description ?? "",
+        quantity: item.quantity,
+        unit: item.unit,
+        unitPrice: item.unit_price,
+        discountType: item.discount_type,
+        discountValue: item.discount_value,
+        taxRate: item.tax_rate,
+        withholdingRate: item.withholding_rate,
+      }))
+    : quoteRequest && quoteRequest.cart_snapshot.length > 0
       ? quoteRequest.cart_snapshot.map<QuoteItemForm>((item) => ({
           id: crypto.randomUUID(),
           itemType: item.product_id ? "catalog" : "custom",
@@ -121,9 +144,9 @@ export function QuoteBuilder({
       : [emptyItem(defaultTaxRate)];
 
   const [clientMode, setClientMode] = useState<"existing" | "new">(
-    quoteRequest || clients.length === 0 ? "new" : "existing"
+    existingQuote ? "existing" : quoteRequest || clients.length === 0 ? "new" : "existing"
   );
-  const [clientId, setClientId] = useState("");
+  const [clientId, setClientId] = useState(existingQuote?.quote.client_id ?? "");
   const [newClient, setNewClient] = useState<NewClientForm>({
     client_type: quoteRequest?.company ? "company" : "individual",
     business_name:
@@ -139,15 +162,25 @@ export function QuoteBuilder({
   });
   const [items, setItems] = useState(initialItems);
   const [status, setStatus] = useState<QuoteStatus>("draft");
-  const [currency, setCurrency] = useState(settings?.currency ?? "MXN");
-  const [issueDate, setIssueDate] = useState(today);
-  const [validUntil, setValidUntil] = useState(
-    addDays(today, settings?.default_validity_days ?? 15)
+  const [currency, setCurrency] = useState(
+    existingQuote?.quote.currency ?? settings?.currency ?? "MXN"
   );
-  const [shipping, setShipping] = useState(0);
-  const [notes, setNotes] = useState(quoteRequest?.general_notes ?? "");
-  const [terms, setTerms] = useState(settings?.default_terms ?? "");
-  const [internalNotes, setInternalNotes] = useState("");
+  const [issueDate, setIssueDate] = useState(existingQuote?.quote.issue_date ?? today);
+  const [validUntil, setValidUntil] = useState(
+    existingQuote?.quote.valid_until ??
+      addDays(today, settings?.default_validity_days ?? 15)
+  );
+  const [shipping, setShipping] = useState(existingQuote?.quote.shipping_total ?? 0);
+  const [notes, setNotes] = useState(
+    existingQuote?.quote.notes ?? quoteRequest?.general_notes ?? ""
+  );
+  const [terms, setTerms] = useState(
+    existingQuote?.quote.terms ?? settings?.default_terms ?? ""
+  );
+  const [internalNotes, setInternalNotes] = useState(
+    existingQuote?.quote.internal_notes ?? ""
+  );
+  const [changeNotes, setChangeNotes] = useState("");
   const [busyAction, setBusyAction] = useState<"save" | "preview" | null>(null);
   const [error, setError] = useState(initialError);
 
@@ -205,6 +238,7 @@ export function QuoteBuilder({
               productId: product.id,
               sku: product.sku ?? "",
               name: product.name,
+              description: product.description ?? "",
               unit: product.unit,
               unitPrice: product.price ?? product.unit_price ?? 0,
               taxRate: product.tax_rate,
@@ -234,6 +268,7 @@ export function QuoteBuilder({
       notes,
       terms,
       internalNotes,
+      ...(existingQuote ? { changeNotes } : {}),
       items: items.map(({ id: _id, ...item }) => item),
     };
   }
@@ -248,7 +283,10 @@ export function QuoteBuilder({
     setBusyAction("preview");
     setError("");
     try {
-      const response = await fetch("/api/admin/quotes/preview", {
+      const previewParams = existingQuote
+        ? `?quoteNumber=${encodeURIComponent(existingQuote.quote.quote_number)}&version=${existingQuote.quote.version + 1}`
+        : "";
+      const response = await fetch(`/api/admin/quotes/preview${previewParams}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildPayload()),
@@ -281,22 +319,38 @@ export function QuoteBuilder({
     setBusyAction("save");
     setError("");
     try {
-      const response = await fetch("/api/admin/quotes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildPayload()),
-      });
+      const response = await fetch(
+        existingQuote
+          ? `/api/admin/quotes/${existingQuote.quote.id}/revision`
+          : "/api/admin/quotes",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildPayload()),
+        }
+      );
       const payload = (await response.json()) as {
         error?: string;
-        quote?: { id: string; quoteNumber: string };
+        quote?: { id: string; quoteNumber: string; version?: number };
       };
       if (!response.ok || !payload.quote) {
-        throw new Error(payload.error ?? "No se pudo crear la cotización.");
+        throw new Error(
+          payload.error ??
+            (existingQuote
+              ? "No se pudo crear la revisión."
+              : "No se pudo crear la cotización.")
+        );
       }
       router.push(`/admin/cotizaciones/${payload.quote.id}`);
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "No se pudo crear la cotización.");
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : existingQuote
+            ? "No se pudo crear la revisión."
+            : "No se pudo crear la cotización."
+      );
     } finally {
       setBusyAction(null);
     }
@@ -306,9 +360,15 @@ export function QuoteBuilder({
     <div className="max-w-6xl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Nueva cotización</h1>
+          <h1 className="text-2xl font-bold text-white">
+            {existingQuote
+              ? `Editar ${existingQuote.quote.quote_number} · R${existingQuote.quote.version}`
+              : "Nueva cotización"}
+          </h1>
           <p className="mt-1 text-sm text-slate-400">
-            {quoteRequest
+            {existingQuote
+              ? `Los cambios se guardarán como revisión R${existingQuote.quote.version + 1} con el estado que selecciones.`
+              : quoteRequest
               ? `Convirtiendo la solicitud ${quoteRequest.request_number}`
               : "Constructor de cotización formal."}
           </p>
@@ -330,7 +390,11 @@ export function QuoteBuilder({
             className="admin-btn-primary disabled:opacity-60"
           >
             <Save className="size-4" />
-            {busyAction === "save" ? "Guardando…" : "Guardar cotización"}
+            {busyAction === "save"
+              ? "Guardando…"
+              : existingQuote
+                ? `Crear revisión R${existingQuote.quote.version + 1}`
+                : "Guardar cotización"}
           </button>
         </div>
       </div>
@@ -344,7 +408,7 @@ export function QuoteBuilder({
       <section className="glass-panel mt-8 rounded-2xl p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-white">Cliente</h2>
-          {!quoteRequest && clients.length > 0 && (
+          {!quoteRequest && !existingQuote && clients.length > 0 && (
             <div className="flex rounded-lg border border-white/10 p-1 text-xs">
               <button
                 type="button"
@@ -435,18 +499,21 @@ export function QuoteBuilder({
       <section className="glass-panel mt-6 rounded-2xl p-6">
         <div className="mb-5 rounded-xl border border-cyanx/20 bg-cyanx/5 px-4 py-3">
           <p className="text-xs uppercase tracking-wider text-slate-500">
-            Próximo folio estimado
+            {existingQuote ? "Folio y revisión actual" : "Próximo folio estimado"}
           </p>
           <p className="mt-1 font-mono text-lg font-bold text-cyanx">
-            {(settings?.quote_prefix ?? "COT").toUpperCase()}-
-            {String(settings?.next_quote_number ?? 1).padStart(6, "0")}
+            {existingQuote
+              ? `${existingQuote.quote.quote_number} · R${existingQuote.quote.version}`
+              : `${(settings?.quote_prefix ?? "COT").toUpperCase()}-${String(settings?.next_quote_number ?? 1).padStart(6, "0")}`}
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            El consecutivo definitivo se reserva de forma atómica al guardar.
+            {existingQuote
+              ? `Al guardar se preservará R${existingQuote.quote.version} y se generará R${existingQuote.quote.version + 1}.`
+              : "El consecutivo definitivo se reserva de forma atómica al guardar."}
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-4">
-          <Field label="Estado inicial">
+          <Field label={existingQuote ? "Estado de la nueva revisión" : "Estado inicial"}>
             <select
               value={status}
               onChange={(event) => setStatus(event.target.value as QuoteStatus)}
@@ -689,6 +756,17 @@ export function QuoteBuilder({
                 className="admin-input"
               />
             </Field>
+            {existingQuote && (
+              <Field label={`Motivo de la revisión R${existingQuote.quote.version + 1} *`}>
+                <textarea
+                  value={changeNotes}
+                  onChange={(event) => setChangeNotes(event.target.value)}
+                  rows={3}
+                  placeholder="Ej. Se ajustaron cantidades, alcance y vigencia."
+                  className="admin-input"
+                />
+              </Field>
+            )}
           </div>
 
           <div className="h-fit rounded-xl border border-white/10 bg-white/[0.03] p-5">

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { generateQuotePdf } from "@/lib/pdf/generate-quote-pdf";
+import { formatAddress } from "@/lib/pdf/format-address";
+import { loadPdfLogo } from "@/lib/pdf/load-logo";
 import { createPdfResponse } from "@/lib/pdf/pdf-response";
 import { prepareQuote } from "@/lib/quotations/prepare-quote";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -61,12 +63,20 @@ export async function POST(request: NextRequest) {
           rfc: inlineClient?.rfc,
         };
 
+    const requestedQuoteNumber = request.nextUrl.searchParams.get("quoteNumber");
+    const requestedVersion = Number(request.nextUrl.searchParams.get("version"));
+    const previewQuoteNumber =
+      requestedQuoteNumber?.trim() || `${settings?.quote_prefix ?? "COT"}-VISTA-PREVIA`;
+    const previewVersion =
+      Number.isInteger(requestedVersion) && requestedVersion > 0 ? requestedVersion : 1;
+    const logo = await loadPdfLogo(settings?.logo_url);
     const pdf = await generateQuotePdf({
-      quoteNumber: `${settings?.quote_prefix ?? "COT"}-VISTA-PREVIA`,
-      version: 1,
+      quoteNumber: previewQuoteNumber,
+      version: previewVersion,
       issueDate: validation.data.issueDate,
       validUntil: validation.data.validUntil,
       status: validation.data.status,
+      currency: validation.data.currency,
       company: {
         name: settings?.trade_name ?? "VORTECH",
         legalName: settings?.legal_name,
@@ -74,6 +84,9 @@ export async function POST(request: NextRequest) {
         phone: settings?.phone ?? "",
         email: settings?.email ?? "",
         website: settings?.website ?? undefined,
+        address: formatAddress(settings?.address),
+        responsibleName: settings?.responsible_name ?? undefined,
+        logo,
       },
       client,
       items: validation.data.items.map((item, index) => ({

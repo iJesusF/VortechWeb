@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   CheckCircle2,
+  BriefcaseBusiness,
   ClipboardList,
   Clock,
   DollarSign,
@@ -9,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { getQuoteStatusLabel } from "@/lib/quotations/status";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +20,11 @@ export default async function AdminDashboard() {
   const [{ data: requests, error: requestsError }, { data: quotes, error: quotesError }] =
     await Promise.all([
       supabase.from("quote_requests").select("id, status, created_at"),
-      supabase.from("quotes").select("id, status, grand_total, currency, created_at"),
+      supabase
+        .from("quotes")
+        .select(
+          "id, quote_number, version, status, grand_total, currency, approved_version, created_at"
+        ),
     ]);
 
   const requestRows = requests ?? [];
@@ -51,6 +57,11 @@ export default async function AdminDashboard() {
       ["accepted", "payment_pending", "paid"].includes(quote.status)
     )
   );
+  const activeProjects = quoteRows.filter(
+    (quote) =>
+      quote.approved_version !== null &&
+      !["cancelled", "rejected"].includes(quote.status)
+  );
 
   const stats = [
     {
@@ -82,6 +93,13 @@ export default async function AdminDashboard() {
       icon: CheckCircle2,
       href: "/admin/cotizaciones?status=accepted",
       color: "text-emerald-400",
+    },
+    {
+      label: "Proyectos en curso",
+      value: String(activeProjects.length),
+      icon: BriefcaseBusiness,
+      href: "/admin/cotizaciones?status=accepted",
+      color: "text-cyanx",
     },
     {
       label: "Cotizaciones vencidas",
@@ -147,14 +165,57 @@ export default async function AdminDashboard() {
         })}
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-4">
         <SummaryCard label="Solicitudes históricas" value={requestRows.length} />
         <SummaryCard label="Cotizaciones históricas" value={quoteRows.length} />
         <SummaryCard
           label="Solicitudes convertidas"
           value={requestRows.filter((request) => request.status === "converted").length}
         />
+        <SummaryCard
+          label="Revisiones aprobadas"
+          value={quoteRows.filter((quote) => quote.approved_version !== null).length}
+        />
       </div>
+
+      <section className="glass-panel mt-8 rounded-2xl p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Proyectos en curso</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Cotizaciones con una revisión aprobada que siguen activas.
+            </p>
+          </div>
+          <BriefcaseBusiness className="size-5 text-cyanx" />
+        </div>
+        {activeProjects.length === 0 ? (
+          <p className="mt-5 text-sm text-slate-500">
+            Todavía no hay cotizaciones aprobadas en curso.
+          </p>
+        ) : (
+          <div className="mt-5 divide-y divide-white/5">
+            {activeProjects.slice(0, 6).map((quote) => (
+              <Link
+                key={quote.id}
+                href={`/admin/cotizaciones/${quote.id}`}
+                className="flex flex-col gap-2 py-4 transition hover:text-cyanx sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p className="font-mono text-sm font-semibold text-white">
+                    {quote.quote_number} · R{quote.version}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Aprobada R{quote.approved_version} · {getQuoteStatusLabel(quote.status)}
+                  </p>
+                </div>
+                <span className="text-sm font-semibold text-cyanx">
+                  Abrir cotización
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

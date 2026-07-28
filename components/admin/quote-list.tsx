@@ -49,7 +49,17 @@ export function QuoteList({
     setEntries((current) =>
       current.map((entry) =>
         entry.quote.id === id
-          ? { ...entry, quote: { ...entry.quote, status: nextStatus } }
+          ? {
+              ...entry,
+              quote: {
+                ...entry.quote,
+                status: nextStatus,
+                approved_version:
+                  nextStatus === "accepted"
+                    ? entry.quote.version
+                    : entry.quote.approved_version,
+              },
+            }
           : entry
       )
     );
@@ -114,8 +124,15 @@ export function QuoteList({
               <tbody>
                 {filteredEntries.map(({ quote, clientName, contactName }) => (
                   <tr key={quote.id} className="border-b border-white/5 last:border-0">
-                    <td className="px-5 py-4 font-mono font-semibold text-cyanx">
-                      {quote.quote_number}
+                    <td className="px-5 py-4">
+                      <p className="font-mono font-semibold text-cyanx">
+                        {quote.quote_number} · R{quote.version}
+                      </p>
+                      {quote.approved_version && (
+                        <p className="mt-1 text-xs font-semibold text-emerald-300">
+                          Aprobada R{quote.approved_version}
+                        </p>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <p className="font-medium text-white">{clientName}</p>

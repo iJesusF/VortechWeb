@@ -7,6 +7,7 @@ import {
   Download,
   FileText,
   Mail,
+  Pencil,
   Phone,
   ReceiptText,
 } from "lucide-react";
@@ -58,7 +59,12 @@ export default async function QuoteDetailPage({ params }: PageProps) {
 
   if (!quote) notFound();
 
-  const [{ data: client }, { data: items }, { data: events }] = await Promise.all([
+  const [
+    { data: client },
+    { data: items },
+    { data: events },
+    { data: revisions, error: revisionsError },
+  ] = await Promise.all([
     supabase.from("clients").select("*").eq("id", quote.client_id).maybeSingle(),
     supabase
       .from("quote_items")
@@ -70,6 +76,11 @@ export default async function QuoteDetailPage({ params }: PageProps) {
       .select("*")
       .eq("quote_id", quote.id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("quote_revisions")
+      .select("id, version, change_notes, created_at")
+      .eq("quote_id", quote.id)
+      .order("version", { ascending: false }),
   ]);
 
   const currencyFormatter = new Intl.NumberFormat("es-MX", {
@@ -90,9 +101,25 @@ export default async function QuoteDetailPage({ params }: PageProps) {
             Cotización formal
           </p>
           <h1 className="mt-2 font-mono text-2xl font-bold text-white">{quote.quote_number}</h1>
-          <p className="mt-1 text-sm text-slate-400">Versión {quote.version}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-xs text-slate-300">
+              R{quote.version}
+            </span>
+            {quote.approved_version && (
+              <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+                Aprobada: R{quote.approved_version}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex flex-wrap items-start gap-3">
+          <Link
+            href={`/admin/cotizaciones/${quote.id}/editar`}
+            className="admin-btn-ghost"
+          >
+            <Pencil className="size-4" />
+            Crear revisión
+          </Link>
           <QuoteStatusSelect quoteId={quote.id} initialStatus={quote.status} />
           <a
             href={`/api/admin/quotes/${quote.id}/pdf`}
@@ -236,7 +263,65 @@ export default async function QuoteDetailPage({ params }: PageProps) {
           </section>
 
           <section className="glass-panel rounded-2xl p-6">
-            <h2 className="text-lg font-semibold text-white">Historial</h2>
+            <h2 className="text-lg font-semibold text-white">Revisiones</h2>
+            {revisionsError ? (
+              <p className="mt-4 text-sm text-amber-300">
+                Ejecuta la migración 012 para consultar el historial de revisiones.
+              </p>
+            ) : (
+              <ol className="mt-5 space-y-4">
+                <li className="relative border-l border-cyanx/50 pl-4">
+                  <span className="absolute -left-1 top-1 size-2 rounded-full bg-cyanx" />
+                  <div className="flex items-center gap-2">
+                    <p className="font-mono text-sm font-semibold text-white">
+                      R{quote.version} · Actual
+                    </p>
+                    {quote.approved_version === quote.version && (
+                      <span className="text-xs font-semibold text-emerald-300">
+                        Aprobada
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {dateTimeFormatter.format(new Date(quote.updated_at))}
+                  </p>
+                </li>
+                {(revisions ?? []).map((revision) => (
+                  <li key={revision.id} className="relative border-l border-white/10 pl-4">
+                    <span className="absolute -left-1 top-1 size-2 rounded-full bg-slate-500" />
+                    <div className="flex items-center gap-2">
+                      <p className="font-mono text-sm font-semibold text-white">
+                        R{revision.version}
+                      </p>
+                      {quote.approved_version === revision.version && (
+                        <span className="text-xs font-semibold text-emerald-300">
+                          Aprobada
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {dateTimeFormatter.format(new Date(revision.created_at))}
+                    </p>
+                    {revision.change_notes && (
+                      <p className="mt-2 text-xs leading-5 text-slate-300">
+                        {revision.change_notes}
+                      </p>
+                    )}
+                    <a
+                      href={`/api/admin/quotes/${quote.id}/revisions/${revision.version}/pdf`}
+                      className="mt-2 inline-flex items-center gap-1.5 text-xs text-cyanx hover:text-white"
+                    >
+                      <Download className="size-3.5" />
+                      Descargar R{revision.version}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+
+          <section className="glass-panel rounded-2xl p-6">
+            <h2 className="text-lg font-semibold text-white">Actividad</h2>
             {(events ?? []).length === 0 ? (
               <p className="mt-4 text-sm text-slate-500">Aún no hay eventos registrados.</p>
             ) : (

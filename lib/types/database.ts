@@ -201,6 +201,7 @@ export interface Database {
           id: string;
           quote_number: string;
           version: number;
+          approved_version: number | null;
           client_id: string;
           request_id: string | null;
           status: QuoteStatus;
@@ -266,6 +267,28 @@ export interface Database {
         Insert: Omit<Database["public"]["Tables"]["quote_events"]["Row"], "id" | "created_at">;
         Update: Partial<Database["public"]["Tables"]["quote_events"]["Insert"]>;
         Relationships: [];
+      };
+      quote_revisions: {
+        Row: {
+          id: string;
+          quote_id: string;
+          version: number;
+          snapshot: Json;
+          change_notes: string | null;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["quote_revisions"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["quote_revisions"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "quote_revisions_quote_id_fkey";
+            columns: ["quote_id"];
+            isOneToOne: false;
+            referencedRelation: "quotes";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       payment_methods: {
         Row: {
@@ -335,6 +358,7 @@ export interface Database {
           email: string;
           website: string | null;
           logo_url: string | null;
+          logo_storage_path: string | null;
           currency: string;
           default_validity_days: number;
           default_terms: string | null;
@@ -384,6 +408,29 @@ export interface Database {
           _quote_id: string;
           _status: QuoteStatus;
           _metadata: Json;
+        };
+        Returns: Json;
+      };
+      revise_quote_with_items: {
+        Args: {
+          _quote_id: string;
+          _client_id: string;
+          _status: QuoteStatus;
+          _currency: string;
+          _issue_date: string;
+          _valid_until: string;
+          _subtotal: number;
+          _discount_total: number;
+          _shipping_total: number;
+          _tax_total: number;
+          _withholding_total: number;
+          _payment_fee_total: number;
+          _grand_total: number;
+          _notes: string;
+          _terms: string;
+          _internal_notes: string;
+          _items: Json;
+          _change_notes: string;
         };
         Returns: Json;
       };

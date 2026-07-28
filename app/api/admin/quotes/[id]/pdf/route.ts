@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { generateQuotePdf } from "@/lib/pdf/generate-quote-pdf";
+import { formatAddress } from "@/lib/pdf/format-address";
+import { loadPdfLogo } from "@/lib/pdf/load-logo";
 import { createPdfResponse } from "@/lib/pdf/pdf-response";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -57,12 +59,14 @@ export async function GET(_request: Request, context: RouteContext) {
       return NextResponse.json({ error: "No se encontró el cliente de la cotización." }, { status: 500 });
     }
 
+    const logo = await loadPdfLogo(settings?.logo_url);
     const pdf = await generateQuotePdf({
       quoteNumber: quote.quote_number,
       version: quote.version,
       issueDate: quote.issue_date,
       validUntil: quote.valid_until,
       status: quote.status,
+      currency: quote.currency,
       company: {
         name: settings?.trade_name ?? "VORTECH",
         legalName: settings?.legal_name,
@@ -70,6 +74,9 @@ export async function GET(_request: Request, context: RouteContext) {
         phone: settings?.phone ?? "",
         email: settings?.email ?? "",
         website: settings?.website ?? undefined,
+        address: formatAddress(settings?.address),
+        responsibleName: settings?.responsible_name ?? undefined,
+        logo,
       },
       client: {
         businessName: client.business_name,
@@ -112,7 +119,11 @@ export async function GET(_request: Request, context: RouteContext) {
       });
     }
 
-    return createPdfResponse(pdf, `cotizacion-${quote.quote_number}.pdf`, "attachment");
+    return createPdfResponse(
+      pdf,
+      `cotizacion-${quote.quote_number}-R${quote.version}.pdf`,
+      "attachment"
+    );
   } catch (error) {
     console.error("[quote-pdf]", {
       message: error instanceof Error ? error.message : "Unknown error",

@@ -77,4 +77,17 @@ export const quoteStatusUpdateSchema = z.object({
   note: z.string().trim().max(2000).optional().default(""),
 });
 
+export const quoteRevisionInputSchema = quoteInputSchema.and(
+  z.object({
+    clientId: z.string().uuid("Selecciona un cliente válido."),
+    client: z.null().optional(),
+    changeNotes: z
+      .string()
+      .trim()
+      .min(3, "Describe brevemente los cambios de esta revisión.")
+      .max(2000),
+  })
+);
+
 export type QuoteInput = z.infer<typeof quoteInputSchema>;
+export type QuoteRevisionInput = z.infer<typeof quoteRevisionInputSchema>;

@@ -25,7 +25,7 @@ const adminNav = [
   { label: "Solicitudes", href: "/admin/solicitudes", icon: ClipboardList },
   { label: "Clientes", href: "/admin/clientes", icon: Users },
   { label: "Cotizaciones", href: "/admin/cotizaciones", icon: FileText },
-  { label: "Empresa", href: "/admin/configuracion/empresa", icon: Building2 },
+  { label: "Empresa y PDF", href: "/admin/configuracion/empresa", icon: Building2 },
   { label: "Pagos", href: "/admin/configuracion/pagos", icon: CreditCard },
   { label: "Facturación", href: "/admin/configuracion/facturacion", icon: Receipt },
 ];
