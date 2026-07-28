@@ -355,7 +355,39 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      create_quote_with_items: {
+        Args: {
+          _client_id: string | null;
+          _client: Json | null;
+          _request_id: string | null;
+          _status: QuoteStatus;
+          _currency: string;
+          _issue_date: string;
+          _valid_until: string;
+          _subtotal: number;
+          _discount_total: number;
+          _shipping_total: number;
+          _tax_total: number;
+          _withholding_total: number;
+          _payment_fee_total: number;
+          _grand_total: number;
+          _notes: string;
+          _terms: string;
+          _internal_notes: string;
+          _items: Json;
+        };
+        Returns: Json;
+      };
+      update_quote_status: {
+        Args: {
+          _quote_id: string;
+          _status: QuoteStatus;
+          _metadata: Json;
+        };
+        Returns: Json;
+      };
+    };
     Enums: Record<string, never>;
   };
 }

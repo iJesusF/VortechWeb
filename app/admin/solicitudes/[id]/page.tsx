@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Building2,
   ExternalLink,
+  FilePlus2,
   Mail,
   MessageCircle,
   Phone,
@@ -258,6 +259,20 @@ export default async function QuoteRequestDetailPage({ params }: PageProps) {
               >
                 Abrir cotización
                 <ExternalLink className="size-4" />
+              </Link>
+            </section>
+          )}
+          {!quoteRequest.converted_quote_id && (
+            <section className="rounded-2xl border border-cyanx/25 bg-cyanx/10 p-5">
+              <p className="text-sm text-slate-200">
+                Crea una cotización formal con el cliente y las partidas de esta solicitud.
+              </p>
+              <Link
+                href={`/admin/cotizaciones/nueva?request=${quoteRequest.id}`}
+                className="admin-btn-primary mt-4 w-full justify-center"
+              >
+                <FilePlus2 className="size-4" />
+                Convertir en cotización
               </Link>
             </section>
           )}
