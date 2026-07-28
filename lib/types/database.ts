@@ -1,0 +1,447 @@
+/** Supabase Database type definitions for VORTECH */
+
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+
+export type ClientType = "individual" | "company";
+
+export type QuoteRequestStatus = "new" | "reviewing" | "converted" | "closed";
+
+export type QuoteStatus =
+  | "draft"
+  | "sent"
+  | "viewed"
+  | "accepted"
+  | "rejected"
+  | "expired"
+  | "cancelled"
+  | "payment_pending"
+  | "paid";
+
+export type QuoteItemType = "catalog" | "custom";
+
+export type DiscountType = "none" | "fixed" | "percentage";
+
+export type PriceMode = "request_quote" | "fixed" | "from" | "hidden";
+
+export type PaymentMethodType = "gateway" | "bank_transfer";
+
+export type FeeType = "none" | "fixed" | "percentage";
+
+export type FeePaidBy = "seller" | "customer";
+
+export type PaymentSessionStatus =
+  | "created"
+  | "pending"
+  | "completed"
+  | "failed"
+  | "cancelled"
+  | "expired";
+
+export type QuoteEventType =
+  | "created"
+  | "edited"
+  | "sent"
+  | "viewed"
+  | "accepted"
+  | "rejected"
+  | "pdf_downloaded"
+  | "payment_link_created"
+  | "marked_paid"
+  | "cancelled"
+  | "version_created";
+
+export interface Address {
+  street: string;
+  exterior_number: string;
+  interior_number?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+}
+
+export interface CartSnapshotItem {
+  product_id?: string;
+  name: string;
+  sku?: string | null;
+  quantity: number;
+  url?: string | null;
+  observations?: string | null;
+  unit_price?: number | null;
+  image_url?: string | null;
+}
+
+export interface Database {
+  public: {
+    Tables: {
+      categories: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          image_url: string | null;
+          sort_order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["categories"]["Row"], "id" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["categories"]["Insert"]>;
+        Relationships: [];
+      };
+      products: {
+        Row: {
+          id: string;
+          category_id: string;
+          name: string;
+          slug: string;
+          sku: string | null;
+          description: string | null;
+          short_description: string | null;
+          unit_price: number | null;
+          price: number | null;
+          price_mode: PriceMode;
+          currency: string;
+          unit: string;
+          image_url: string | null;
+          images: string[];
+          specifications: Json | null;
+          discount_type: DiscountType;
+          discount_value: number;
+          tax_rate: number;
+          is_active: boolean;
+          is_featured: boolean;
+          sort_order: number;
+          whatsapp_message_override: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["products"]["Row"], "id" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["products"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "categories";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      product_images: {
+        Row: {
+          id: string;
+          product_id: string;
+          storage_path: string;
+          public_url: string;
+          alt_text: string | null;
+          sort_order: number;
+          is_cover: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["product_images"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["product_images"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      clients: {
+        Row: {
+          id: string;
+          client_type: ClientType;
+          business_name: string;
+          contact_name: string;
+          email: string;
+          phone: string;
+          rfc: string | null;
+          tax_regime: string | null;
+          cfdi_use: string | null;
+          fiscal_zip_code: string | null;
+          billing_address: Address | null;
+          shipping_address: Address | null;
+          notes: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["clients"]["Row"], "id" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["clients"]["Insert"]>;
+        Relationships: [];
+      };
+      quote_requests: {
+        Row: {
+          id: string;
+          request_number: string;
+          customer_name: string;
+          company: string | null;
+          email: string;
+          phone: string;
+          rfc: string | null;
+          general_notes: string | null;
+          status: QuoteRequestStatus;
+          cart_snapshot: CartSnapshotItem[];
+          converted_quote_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["quote_requests"]["Row"], "id" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["quote_requests"]["Insert"]>;
+        Relationships: [];
+      };
+      quotes: {
+        Row: {
+          id: string;
+          quote_number: string;
+          version: number;
+          approved_version: number | null;
+          client_id: string;
+          request_id: string | null;
+          status: QuoteStatus;
+          currency: string;
+          issue_date: string;
+          valid_until: string;
+          subtotal: number;
+          discount_total: number;
+          shipping_total: number;
+          tax_total: number;
+          withholding_total: number;
+          payment_fee_total: number;
+          grand_total: number;
+          notes: string | null;
+          terms: string | null;
+          internal_notes: string | null;
+          public_token: string;
+          public_token_expires_at: string | null;
+          accepted_at: string | null;
+          rejected_at: string | null;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["quotes"]["Row"], "id" | "quote_number" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["quotes"]["Insert"]>;
+        Relationships: [];
+      };
+      quote_items: {
+        Row: {
+          id: string;
+          quote_id: string;
+          item_type: QuoteItemType;
+          product_id: string | null;
+          sku: string | null;
+          name: string;
+          description: string | null;
+          quantity: number;
+          unit: string;
+          unit_price: number;
+          discount_type: DiscountType;
+          discount_value: number;
+          tax_rate: number;
+          withholding_rate: number;
+          line_subtotal: number;
+          line_total: number;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["quote_items"]["Row"], "id" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["quote_items"]["Insert"]>;
+        Relationships: [];
+      };
+      quote_events: {
+        Row: {
+          id: string;
+          quote_id: string;
+          event_type: QuoteEventType;
+          metadata: Json | null;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["quote_events"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["quote_events"]["Insert"]>;
+        Relationships: [];
+      };
+      quote_revisions: {
+        Row: {
+          id: string;
+          quote_id: string;
+          version: number;
+          snapshot: Json;
+          change_notes: string | null;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["quote_revisions"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["quote_revisions"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "quote_revisions_quote_id_fkey";
+            columns: ["quote_id"];
+            isOneToOne: false;
+            referencedRelation: "quotes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payment_methods: {
+        Row: {
+          id: string;
+          type: PaymentMethodType;
+          provider: string;
+          display_name: string;
+          is_enabled: boolean;
+          sort_order: number;
+          fee_type: FeeType;
+          fee_value: number;
+          fee_paid_by: FeePaidBy;
+          public_instructions: string | null;
+          private_configuration: Json | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["payment_methods"]["Row"], "id" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["payment_methods"]["Insert"]>;
+        Relationships: [];
+      };
+      payment_sessions: {
+        Row: {
+          id: string;
+          quote_id: string;
+          provider: string;
+          external_reference: string | null;
+          amount: number;
+          currency: string;
+          fee_amount: number;
+          checkout_url: string | null;
+          status: PaymentSessionStatus;
+          provider_response: Json | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["payment_sessions"]["Row"], "id" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["payment_sessions"]["Insert"]>;
+        Relationships: [];
+      };
+      billing_documents: {
+        Row: {
+          id: string;
+          quote_id: string;
+          provider: string;
+          external_id: string | null;
+          status: string;
+          document_type: string;
+          pdf_url: string | null;
+          xml_url: string | null;
+          error_message: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["billing_documents"]["Row"], "id" | "created_at" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["billing_documents"]["Insert"]>;
+        Relationships: [];
+      };
+      company_settings: {
+        Row: {
+          id: string;
+          legal_name: string;
+          trade_name: string;
+          rfc: string | null;
+          address: Address | null;
+          phone: string;
+          email: string;
+          website: string | null;
+          logo_url: string | null;
+          logo_storage_path: string | null;
+          currency: string;
+          default_validity_days: number;
+          default_terms: string | null;
+          default_tax_rate: number;
+          default_withholding_rate: number;
+          tax_enabled: boolean;
+          withholding_enabled: boolean;
+          quote_prefix: string;
+          next_quote_number: number;
+          pdf_footer: string | null;
+          responsible_name: string | null;
+          whatsapp: string | null;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["company_settings"]["Row"], "id" | "updated_at">;
+        Update: Partial<Database["public"]["Tables"]["company_settings"]["Insert"]>;
+        Relationships: [];
+      };
+    };
+    Views: Record<string, never>;
+    Functions: {
+      create_quote_with_items: {
+        Args: {
+          _client_id: string | null;
+          _client: Json | null;
+          _request_id: string | null;
+          _status: QuoteStatus;
+          _currency: string;
+          _issue_date: string;
+          _valid_until: string;
+          _subtotal: number;
+          _discount_total: number;
+          _shipping_total: number;
+          _tax_total: number;
+          _withholding_total: number;
+          _payment_fee_total: number;
+          _grand_total: number;
+          _notes: string;
+          _terms: string;
+          _internal_notes: string;
+          _items: Json;
+        };
+        Returns: Json;
+      };
+      update_quote_status: {
+        Args: {
+          _quote_id: string;
+          _status: QuoteStatus;
+          _metadata: Json;
+        };
+        Returns: Json;
+      };
+      revise_quote_with_items: {
+        Args: {
+          _quote_id: string;
+          _client_id: string;
+          _status: QuoteStatus;
+          _currency: string;
+          _issue_date: string;
+          _valid_until: string;
+          _subtotal: number;
+          _discount_total: number;
+          _shipping_total: number;
+          _tax_total: number;
+          _withholding_total: number;
+          _payment_fee_total: number;
+          _grand_total: number;
+          _notes: string;
+          _terms: string;
+          _internal_notes: string;
+          _items: Json;
+          _change_notes: string;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: Record<string, never>;
+  };
+}
+export type Category = Database["public"]["Tables"]["categories"]["Row"];
+export type Product = Database["public"]["Tables"]["products"]["Row"];
+export type ProductImage = Database["public"]["Tables"]["product_images"]["Row"];
+export type ProductWithRelations = Product & {
+  categories: Pick<Category, "id" | "name" | "slug"> | null;
+  product_images: ProductImage[];
+};

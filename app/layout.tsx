@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { siteConfig } from "@/lib/site-config";
-
+import { QuoteCartProvider } from "@/components/quote-cart/cart-provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://vortech.mx"),
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.shortName}`,
   },
   description:
-    "Landing corporativa premium para integración de sistemas mecánicos, automatización industrial, PLC, medición de utilities, tratamiento de agua y dashboards cloud.",
+    "Integración de sistemas mecánicos, automatización industrial, PLC, medición de utilities, tratamiento de agua y dashboards cloud.",
   keywords: [
     "automatización industrial",
     "PLC",
@@ -20,13 +20,14 @@ export const metadata: Metadata = {
     "BMS",
     "medición de utilities",
     "monitoreo cloud",
+    "catálogo industrial",
   ],
   openGraph: {
     title: `${siteConfig.companyName} | Operaciones inteligentes`,
     description:
-      "Integración de sistemas mecánicos, automatización, PLC, utilities, tratamiento de agua y monitoreo cloud para edificios, plantas e infraestructura crítica.",
+      "Integración de sistemas mecánicos, automatización, PLC, utilities, tratamiento de agua y monitoreo cloud.",
     type: "website",
-    locale: "es_US",
+    locale: "es_MX",
   },
   robots: {
     index: true,
@@ -37,7 +38,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" className="dark">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <QuoteCartProvider>
+          {children}
+        </QuoteCartProvider>
+      </body>
     </html>
   );
 }
